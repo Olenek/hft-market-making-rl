@@ -14,27 +14,27 @@ class LOB:
 
     def place_limit_buy(self, price, count):
         if price < self.ask_price:
-            self.x[price-1] -= count
+            self.x[price - 1] -= count
 
     def place_limit_sell(self, price, count):
         if price > self.bid_price:
-            self.x[price-1] += count
+            self.x[price - 1] += count
 
     def place_market_buy(self, count):
-        if self.ask_price < self.n+1:
-            self.x[self.ask_price-1] -= count
+        if self.ask_price < self.n + 1:
+            self.x[self.ask_price - 1] -= count
 
     def place_market_sell(self, count):
         if self.bid_price > 0:
-            self.x[self.bid_price-1] += count
+            self.x[self.bid_price - 1] += count
 
     def cancel_limit_buy(self, price, count):
         if price < self.ask_price:
-            self.x[price-1] += count
+            self.x[price - 1] += count
 
     def cancel_limit_sell(self, price, count):
         if price > self.bid_price:
-            self.x[price-1] -= count
+            self.x[price - 1] -= count
 
     def find_ask(self):
         """
@@ -66,11 +66,11 @@ class LOB:
 
         if price < self.ask_price:
             lbr = self.lambda_ * (self.ask_price - price)
-            clbr = self.theta_ * (self.ask_price - price) * abs(self.x[price-1])
+            clbr = self.theta_ * (self.ask_price - price) * abs(self.x[price - 1])
 
         if price > self.bid_price:
             lsr = self.lambda_ * (price - self.bid_price)
-            clsr = self.theta_ * (price - self.bid_price) * abs(self.x[price-1])
+            clsr = self.theta_ * (price - self.bid_price) * abs(self.x[price - 1])
 
         return lbr, lsr, clbr, clsr
 
@@ -97,7 +97,7 @@ class LOB:
         """
         Completes one iteration of simulation.
         """
-        for price in range(1, self.n+1):
+        for price in range(1, self.n + 1):
             poisson_rates = self.compute_instant_rates(price)
             order_counts = poisson(poisson_rates)
             self.place_price_orders(order_counts, price)
@@ -107,15 +107,28 @@ class LOB:
         self.ask_price = self.find_ask()
         self.bid_price = self.find_bid()
 
-    def run_simulation(self, step_count):
+    def write_state(self, file):
+        """
+        Writes current state of the simulation to file
+        :param file: file opened in append mode
+        """
+        file.write(','.join([str(num) for num in self.x]) + '\n')
+
+    def run_simulation(self, step_count, write=False):
         """
         Runs the simulation for specified number of steps.
+        :param write: flag indicating if save data to file
         :param step_count: steps to run.
         """
+        if write:
+            file = open('output.csv', 'a')
+            file.truncate(0)
         for i in range(step_count):
-            # print(f'A = {self.ask_price}; B = {self.bid_price}; {self.t}')
             self.update()
-            # print("\n")
+            if write:
+                self.write_state(file)
+        if write:
+            file.close()
 
     def flush_simulation(self):
         """
@@ -128,5 +141,5 @@ class LOB:
         self.bid_price = 0
 
 
-lob = LOB(50, 1.85, 0.71, 2)
-lob.run_simulation(10000)
+lob = LOB(20, 1.85, 0.71, 2)
+lob.run_simulation(10000, True)
