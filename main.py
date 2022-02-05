@@ -272,18 +272,18 @@ class LOB:
 
 
 lob = LOB(20, 1.85, 0.71, 2, 12)
-# lob.run_simulation(10000, True)
-episode_count = 5000
-profits = []
-for i in range(episode_count):
-    if i % 50 == 0:
-        print(f'{i//50}%')
-    lob.flush_simulation()
-    lob.run_simulation(300)
-    profit = lob.train_simulation(epsilon = 1 - i/episode_count)
-    if i%10 == 0:
-        profits.append(profit)
-print('Done')
-
-with open('profits.csv', 'w') as file:
-    file.write(','.join([str(num) for num in profits]) + '\n')
+lob.run_simulation(10000, True)
+# episode_count = 5000
+# profits = []
+# for i in range(episode_count):
+#     if i % 50 == 0:
+#         print(f'{i//50}%')
+#     lob.flush_simulation()
+#     lob.run_simulation(300)
+#     profit = lob.train_simulation(epsilon = 1 - i/episode_count)
+#     if i%10 == 0:
+#         profits.append(profit)
+# print('Done')
+#
+# with open('profits.csv', 'w') as file:
+#     file.write(','.join([str(num) for num in profits]) + '\n')
